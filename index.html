@@ -1,0 +1,425 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Smart Library — Live Dashboard</title>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Outfit', 'sans-serif'],
+          },
+          colors: {
+            glass: "rgba(30, 41, 59, 0.7)",
+            'glass-border': "rgba(255, 255, 255, 0.1)",
+          },
+          animation: {
+            'float': 'float 6s ease-in-out infinite',
+            'spin-slow': 'spin 12s linear infinite',
+          },
+          keyframes: {
+            float: {
+              '0%, 100%': { transform: 'translateY(0)' },
+              '50%': { transform: 'translateY(-10px)' },
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    /* --- THEME UPDATE: 3D Cyber Background --- */
+    body {
+      background-color: #020617;
+      /* 1. Gradient Overlay: Darkens the image so text is readable 
+         2. Image URL: A high-quality 3D abstract tech render
+      */
+      background-image: 
+        linear-gradient(to bottom, rgba(2, 6, 23, 0.85), rgba(2, 6, 23, 0.95)),
+        url('https://images.unsplash.com/photo-1635070041078-e363dbe005cb?q=80&w=2600&auto=format&fit=crop');
+      
+      background-size: cover;
+      background-position: center;
+      background-attachment: fixed;
+      background-repeat: no-repeat;
+    }
+
+    /* --- 3D Floating Orb Animation in Background --- */
+    .orb-container {
+      position: fixed;
+      top: -10%;
+      right: -5%;
+      width: 600px;
+      height: 600px;
+      background: radial-gradient(circle, rgba(99, 102, 241, 0.15) 0%, rgba(0,0,0,0) 70%);
+      filter: blur(60px);
+      z-index: -1;
+      animation: pulse-orb 8s ease-in-out infinite;
+      pointer-events: none;
+    }
+
+    @keyframes pulse-orb {
+      0% { transform: scale(1) translate(0, 0); opacity: 0.5; }
+      50% { transform: scale(1.2) translate(-20px, 20px); opacity: 0.8; }
+      100% { transform: scale(1) translate(0, 0); opacity: 0.5; }
+    }
+
+    /* Glassmorphism Utility */
+    .glass-panel {
+      background: rgba(15, 23, 42, 0.6); 
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    }
+
+    /* Animations */
+    .fade-in { animation: fadeIn 0.5s ease-out forwards; }
+    
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+</head>
+<body class="text-gray-200 min-h-screen font-sans overflow-x-hidden selection:bg-indigo-500 selection:text-white">
+
+  <div class="orb-container"></div>
+
+  <header class="sticky top-4 z-50 mx-4">
+    <div class="glass-panel max-w-6xl mx-auto rounded-2xl px-6 py-3 flex items-center justify-between transition-all hover:border-indigo-500/30">
+      <div class="flex items-center gap-6">
+        <div class="flex items-center gap-2">
+          <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center shadow-lg shadow-indigo-500/20">
+            <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"></path></svg>
+          </div>
+          <div class="text-xl font-bold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-white to-gray-400">SmartLibrary</div>
+        </div>
+        
+        <nav class="hidden md:flex gap-1 bg-gray-900/40 p-1 rounded-xl border border-white/5">
+          <button data-page="home" class="nav-btn px-4 py-1.5 rounded-lg text-sm font-medium transition-all duration-300 hover:text-white text-gray-400">Dashboard</button>
+          <button data-page="seats" class="nav-btn px-4 py-1.5 rounded-lg text-sm font-medium transition-all duration-300 hover:text-white text-gray-400">Seat Map</button>
+          <button data-page="devices" class="nav-btn px-4 py-1.5 rounded-lg text-sm font-medium transition-all duration-300 hover:text-white text-gray-400">Devices</button>
+          <button data-page="analytics" class="nav-btn px-4 py-1.5 rounded-lg text-sm font-medium transition-all duration-300 hover:text-white text-gray-400">Analytics</button>
+        </nav>
+      </div>
+
+      <div class="hidden md:flex items-center gap-3">
+        <span class="flex h-2 w-2 relative">
+          <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+          <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+        </span>
+        <div class="text-xs font-mono text-emerald-400 bg-emerald-400/10 px-2 py-1 rounded border border-emerald-400/20">System Online</div>
+      </div>
+
+      <div class="md:hidden">
+        <select id="mobileNav" class="bg-gray-800 border border-gray-700 text-white text-sm rounded-lg block w-full p-2.5 focus:ring-indigo-500 focus:border-indigo-500">
+          <option value="home">Dashboard</option>
+          <option value="seats">Seat Map</option>
+          <option value="devices">Devices</option>
+          <option value="analytics">Analytics</option>
+        </select>
+      </div>
+    </div>
+  </header>
+
+  <main class="max-w-6xl mx-auto p-6 mt-4">
+    <div id="initBanner" class="mb-6 hidden p-4 rounded-xl bg-red-500/10 border border-red-500/20 text-sm text-red-200 flex items-center gap-3">
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+      <span id="bannerText"></span>
+    </div>
+
+    <section id="home" class="page fade-in">
+      <div class="text-center py-16 relative">
+        <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-32 h-32 bg-indigo-500/20 rounded-full blur-3xl -z-10"></div>
+        <h1 class="text-4xl md:text-6xl font-bold mb-6 text-white tracking-tight drop-shadow-lg">
+            Smart Library <span class="text-indigo-400">IoT</span>
+        </h1>
+        <p class="text-gray-300 max-w-xl mx-auto text-lg font-light leading-relaxed">
+            Real-time occupancy tracking powered by Arduino & Firebase. 
+            Monitor your library's digital pulse.
+        </p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-4">
+        <div class="glass-panel p-6 rounded-2xl hover:-translate-y-2 transition-all duration-300 group cursor-pointer border-t-4 border-t-blue-500/50" data-page="seats">
+          <div class="flex justify-between items-start mb-4">
+            <div class="p-3 bg-blue-500/10 rounded-xl text-blue-400 group-hover:bg-blue-500 group-hover:text-white transition-colors shadow-lg shadow-blue-500/10">
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path></svg>
+            </div>
+          </div>
+          <h2 class="text-2xl font-bold mb-2 text-white">Seat Map</h2>
+          <p class="text-gray-400 text-sm mb-6">Visualize the physical layout and find empty spots instantly.</p>
+          <div class="flex items-center text-blue-400 text-sm font-bold group-hover:translate-x-1 transition-transform">
+            VIEW MAP <span class="ml-2">&rarr;</span>
+          </div>
+        </div>
+
+        <div class="glass-panel p-6 rounded-2xl hover:-translate-y-2 transition-all duration-300 group cursor-pointer border-t-4 border-t-purple-500/50" data-page="devices">
+          <div class="flex justify-between items-start mb-4">
+            <div class="p-3 bg-purple-500/10 rounded-xl text-purple-400 group-hover:bg-purple-500 group-hover:text-white transition-colors shadow-lg shadow-purple-500/10">
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z"></path></svg>
+            </div>
+          </div>
+          <h2 class="text-2xl font-bold mb-2 text-white">Device Health</h2>
+          <p class="text-gray-400 text-sm mb-6">Status checks for ESP8266/NodeMCU and IR sensors.</p>
+          <div class="flex items-center text-purple-400 text-sm font-bold group-hover:translate-x-1 transition-transform">
+            CHECK NODES <span class="ml-2">&rarr;</span>
+          </div>
+        </div>
+
+        <div class="glass-panel p-6 rounded-2xl hover:-translate-y-2 transition-all duration-300 group cursor-pointer border-t-4 border-t-orange-500/50" data-page="analytics">
+          <div class="flex justify-between items-start mb-4">
+            <div class="p-3 bg-orange-500/10 rounded-xl text-orange-400 group-hover:bg-orange-500 group-hover:text-white transition-colors shadow-lg shadow-orange-500/10">
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
+            </div>
+          </div>
+          <h2 class="text-2xl font-bold mb-2 text-white">Analytics</h2>
+          <p class="text-gray-400 text-sm mb-6">Historical usage trends and student peak hours.</p>
+          <div class="flex items-center text-orange-400 text-sm font-bold group-hover:translate-x-1 transition-transform">
+            VIEW DATA <span class="ml-2">&rarr;</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="seats" class="page hidden fade-in">
+      <div class="flex flex-col md:flex-row items-start md:items-center justify-between mb-6 gap-4">
+        <div>
+            <h1 class="text-3xl font-bold text-white">Seat Availability</h1>
+            <div class="text-gray-400 text-sm mt-1">Live update frequency: <span class="text-emerald-400">Realtime</span> <span id="seatsTag" class="ml-2 text-xs px-2 py-0.5 bg-white/5 rounded border border-white/10">Connecting...</span></div>
+        </div>
+        
+        <div class="flex items-center gap-4 bg-gray-900/50 px-4 py-2 rounded-lg border border-white/5 backdrop-blur-sm">
+            <div class="flex items-center gap-2"><div class="w-3 h-3 rounded-full bg-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.8)]"></div><span class="text-xs text-gray-300">Free</span></div>
+            <div class="flex items-center gap-2"><div class="w-3 h-3 rounded-full bg-rose-500 shadow-[0_0_10px_rgba(244,63,94,0.8)]"></div><span class="text-xs text-gray-300">Occupied</span></div>
+        </div>
+      </div>
+
+      <div class="glass-panel p-6 rounded-2xl">
+        <div id="seatList" class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
+            </div>
+      </div>
+    </section>
+
+    <section id="devices" class="page hidden fade-in">
+      <div class="flex items-center justify-between mb-6">
+        <div>
+            <h1 class="text-3xl font-bold text-white">IoT Devices</h1>
+            <p class="text-gray-400 text-sm mt-1">NodeMCU / Sensors Status <span id="devicesTag" class="ml-2 text-xs px-2 py-0.5 bg-white/5 rounded border border-white/10">Connecting...</span></p>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4" id="deviceList">
+        </div>
+    </section>
+
+    <section id="analytics" class="page hidden fade-in">
+      <h1 class="text-3xl font-bold mb-6 text-white">Analytics</h1>
+      <div class="glass-panel p-10 rounded-2xl text-center border-dashed border-2 border-gray-700/50 relative overflow-hidden">
+        <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-indigo-500 to-transparent opacity-30"></div>
+        
+        <div class="w-16 h-16 bg-gray-800/80 rounded-full flex items-center justify-center mx-auto mb-4 border border-gray-700 shadow-lg shadow-black/50">
+            <svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+        </div>
+        <h2 class="text-xl font-semibold text-white mb-2">Gathering Insights</h2>
+        <p class="text-gray-400 mb-6 max-w-md mx-auto">Charts will appear here once sufficient data has been collected from the sensor array.</p>
+        <button class="px-6 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg text-sm font-bold transition-all shadow-lg shadow-indigo-500/30 hover:shadow-indigo-500/50">Export CSV</button>
+      </div>
+    </section>
+  </main>
+
+  <footer class="text-center text-xs text-gray-500 py-8 mt-auto border-t border-gray-800/50">
+    Smart Library System • VIT Pune • IoT + Arduino + Firebase
+  </footer>
+
+<script>
+  // UI: Switch pages
+  function changePage(page) {
+    document.querySelectorAll(".page").forEach(p => {
+      p.classList.add("hidden");
+      p.classList.remove("fade-in"); 
+    });
+
+    const showPage = document.getElementById(page);
+    if (showPage) {
+      showPage.classList.remove("hidden");
+      void showPage.offsetWidth; 
+      showPage.classList.add("fade-in");
+    }
+
+    // update navbar style
+    document.querySelectorAll(".nav-btn").forEach(btn => {
+      if (btn.dataset.page === page) {
+        btn.classList.remove("text-gray-400");
+        btn.classList.add("bg-indigo-600", "text-white", "shadow-lg", "shadow-indigo-500/40");
+      } else {
+        btn.classList.add("text-gray-400");
+        btn.classList.remove("bg-indigo-600", "text-white", "shadow-lg", "shadow-indigo-500/40");
+      }
+    });
+
+    const select = document.getElementById("mobileNav");
+    if (select) select.value = page;
+  }
+
+  document.querySelectorAll("[data-page]").forEach(el => {
+    el.addEventListener("click", () => changePage(el.dataset.page));
+  });
+  
+  document.getElementById("mobileNav").addEventListener("change", (e) => {
+    changePage(e.target.value);
+  });
+
+  changePage("home");
+</script>
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+  import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyBo3i1lYohzRyXA2htNZQ182aYw--pSYNI",
+    authDomain: "smart-library-2eb6a.firebaseapp.com",
+    databaseURL: "https://smart-library-2eb6a-default-rtdb.asia-southeast1.firebasedatabase.app",
+    projectId: "smart-library-2eb6a",
+    storageBucket: "smart-library-2eb6a.appspot.com",
+    messagingSenderId: "1047559512758",
+    appId: "1:1047559512758:web:89b7660e639a313b543c17",
+    measurementId: "G-KHZ396SDJS"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db = getDatabase(app);
+
+  const seatsTag = document.getElementById('seatsTag');
+  const devicesTag = document.getElementById('devicesTag');
+  const seatList = document.getElementById('seatList');
+  const deviceList = document.getElementById('deviceList');
+  const initBanner = document.getElementById('initBanner');
+  const bannerText = document.getElementById('bannerText');
+
+  const MOCK_SEATS = {
+    "Seat A1": { status: "free" },
+    "Seat A2": { status: "occupied" },
+    "Seat B1": { status: "free" },
+    "Seat B2": { status: "free" }
+  };
+
+  const MOCK_DEVICES = {
+    "NodeMCU_Main": { status: "online" },
+    "IR_Sensor_01": { status: "offline" }
+  };
+
+  function escapeHtml(str) {
+    return str.replace(/[&<>"'/]/g, m => ({
+      '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;','/':'&#x2F;'
+    }[m]));
+  }
+
+  // Render Seats
+  function renderSeats(seatsObj) {
+    const entries = Object.entries(seatsObj || {});
+    seatList.innerHTML = entries.map(([id, seat]) => {
+      const status = seat.status;
+      const isFree = status === "free";
+      
+      const bgClass = isFree 
+        ? "bg-emerald-500/10 border-emerald-500/30 text-emerald-400 hover:bg-emerald-500/20" 
+        : "bg-rose-500/10 border-rose-500/30 text-rose-400 hover:bg-rose-500/20";
+      
+      const glowClass = isFree ? "shadow-[0_0_15px_rgba(16,185,129,0.1)]" : "";
+      const indicatorColor = isFree ? "bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.8)]" : "bg-rose-500 shadow-[0_0_8px_rgba(244,63,94,0.8)]";
+      const statusText = isFree ? "Available" : "Occupied";
+
+      return `
+        <div class="relative p-5 rounded-xl border ${bgClass} ${glowClass} transition-all duration-300 flex flex-col items-center justify-center gap-3 group">
+            <div class="absolute top-3 right-3 w-2 h-2 rounded-full ${indicatorColor}"></div>
+            <svg class="w-8 h-8 opacity-80 group-hover:scale-110 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path></svg>
+            <div class="text-lg font-semibold tracking-wide text-gray-200">${escapeHtml(id)}</div>
+            <div class="text-xs font-mono uppercase tracking-wider opacity-75">${statusText}</div>
+        </div>
+      `;
+    }).join('');
+  }
+
+  // Render Devices
+  function renderDevices(devObj) {
+    const entries = Object.entries(devObj || {});
+    deviceList.innerHTML = entries.map(([id, dev]) => {
+      const status = dev.status;
+      const isOnline = status === "online";
+      
+      const borderClass = isOnline ? "border-emerald-500/20" : "border-red-500/20";
+      const textClass = isOnline ? "text-emerald-400" : "text-red-400";
+      const statusBg = isOnline ? "bg-emerald-500/10" : "bg-red-500/10";
+      const pulse = isOnline ? '<span class="flex h-2 w-2 relative mr-2"><span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span><span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span></span>' : '<span class="h-2 w-2 rounded-full bg-red-500 mr-2"></span>';
+
+      return `
+        <div class="glass-panel p-4 rounded-xl border ${borderClass} flex items-center justify-between group hover:bg-gray-800/50 transition-colors">
+          <div class="flex items-center gap-4">
+            <div class="w-10 h-10 rounded-full bg-gray-900/50 flex items-center justify-center border border-gray-700">
+                <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"></path></svg>
+            </div>
+            <div>
+                <div class="font-semibold text-gray-200">${escapeHtml(id)}</div>
+                <div class="text-xs text-gray-500">Hardware ID: #${Math.floor(Math.random()*1000)}</div>
+            </div>
+          </div>
+          <div class="flex items-center px-3 py-1 rounded-full ${statusBg} ${textClass} text-xs font-medium border ${borderClass}">
+            ${pulse}
+            ${escapeHtml(status.toUpperCase())}
+          </div>
+        </div>
+      `;
+    }).join('');
+  }
+
+  try {
+    const seatsRef = ref(db, "seats");
+    const devicesRef = ref(db, "devices");
+
+    onValue(seatsRef, snapshot => {
+      const data = snapshot.val();
+      if (data) {
+        seatsTag.textContent = "(Live)";
+        seatsTag.className = "ml-2 text-xs px-2 py-0.5 bg-emerald-500/20 text-emerald-400 rounded border border-emerald-500/30";
+        renderSeats(data);
+      } else {
+        renderSeats(MOCK_SEATS);
+      }
+    });
+
+    onValue(devicesRef, snapshot => {
+      const data = snapshot.val();
+      if (data) {
+        devicesTag.textContent = "(Live)";
+        devicesTag.className = "ml-2 text-xs px-2 py-0.5 bg-emerald-500/20 text-emerald-400 rounded border border-emerald-500/30";
+        renderDevices(data);
+      } else {
+        renderDevices(MOCK_DEVICES);
+      }
+    });
+
+    initBanner.classList.add("hidden");
+
+  } catch (err) {
+    console.log("Firebase error:", err);
+    initBanner.classList.remove("hidden");
+    bannerText.innerHTML = "Firebase init failed — using mock data.";
+    renderSeats(MOCK_SEATS);
+    renderDevices(MOCK_DEVICES);
+  }
+</script>
+</body>
+</html>
